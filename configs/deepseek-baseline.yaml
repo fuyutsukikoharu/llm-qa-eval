@@ -1,0 +1,36 @@
+# DeepSeek 真实模型基线：v1 prompt、无同义词、无护栏
+# 与 mock baseline 使用同一套 28 条用例和同一套评分标准，便于对照。
+run_name: deepseek-baseline
+provider: openai
+model: deepseek-chat
+base_url: https://api.deepseek.com/v1
+api_key_env: DEEPSEEK_API_KEY
+temperature: 0.2
+max_tokens: 512
+timeout_s: 90
+retries: 3
+concurrency: 4
+
+paths:
+  cases: ../data/cases.yaml
+  kb: ../data/kb
+  system_prompt: ../prompts/system_v1.md
+  out_dir: ../reports/deepseek-baseline
+
+retrieval:
+  top_k: 3
+  min_score: 3.0
+  expand_synonyms: false
+
+guardrails:
+  enabled: false
+
+judge:
+  provider: openai
+  model: deepseek-chat
+  base_url: https://api.deepseek.com/v1
+  api_key_env: DEEPSEEK_API_KEY
+  temperature: 0.0
+
+report:
+  pass_threshold: 0.8

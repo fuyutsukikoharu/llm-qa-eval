@@ -1,0 +1,42 @@
+# DeepSeek 真实模型加固版：v2 prompt + 同义词检索 + 输入/输出护栏
+run_name: deepseek-hardened
+provider: openai
+model: deepseek-chat
+base_url: https://api.deepseek.com/v1
+api_key_env: DEEPSEEK_API_KEY
+temperature: 0.2
+max_tokens: 512
+timeout_s: 90
+retries: 3
+concurrency: 4
+
+paths:
+  cases: ../data/cases.yaml
+  kb: ../data/kb
+  system_prompt: ../prompts/system_v2.md
+  out_dir: ../reports/deepseek-hardened
+
+retrieval:
+  top_k: 3
+  min_score: 3.0
+  expand_synonyms: true
+
+guardrails:
+  enabled: true
+  block_injection: true
+  block_pii_requests: true
+  block_abuse_requests: true
+  escalate_compensation: true
+  redact_pii: true
+  require_citation: true
+  medical_escalation: true
+
+judge:
+  provider: openai
+  model: deepseek-chat
+  base_url: https://api.deepseek.com/v1
+  api_key_env: DEEPSEEK_API_KEY
+  temperature: 0.0
+
+report:
+  pass_threshold: 0.8

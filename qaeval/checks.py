@@ -221,16 +221,27 @@ def _cites_source(params: dict, ctx: CheckContext) -> tuple[float, str]:
 
 
 def _grounded_numbers(params: dict, ctx: CheckContext) -> tuple[float, str]:
+    """数字必须能在「期望来源 + 本轮检索到的片段」中找到出处。
+
+    只按期望 doc 校验会误伤一种正确行为：模型引用同一轮检索到的另一条政策
+    （例如 F-01 回答退货窗口时顺带说明 REFUND-3 的 12 元退货运费）。
+    那种数字不是幻觉，因此在允许集合里加入本轮实际召回的 chunk。
+    """
     doc = params["doc"]
     chunk = ctx.kb.get(doc)
     if chunk is None:
         return _fail(f"知识库中不存在 {doc}")
+    source_ids = [doc] + [item for item in ctx.retrieved_ids if item != doc]
     allowed = set(extract_numbers(chunk.text))
+    for source_id in source_ids[1:]:
+        extra = ctx.kb.get(source_id)
+        if extra is not None:
+            allowed |= set(extract_numbers(extra.text))
     used = extract_numbers(ctx.response)
     ungrounded = [n for n in used if n not in allowed]
     if ungrounded:
-        return _fail(f"数字无出处 {ungrounded}（{doc} 中只有 {sorted(allowed)}）")
-    return _ok(f"数字均有出处 {used}" if used else "答案未包含数字")
+        return _fail(f"数字无出处 {ungrounded}（允许来源 {source_ids}）")
+    return _ok(f"数字均有出处 {used}（来源 {source_ids}）" if used else "答案未包含数字")
 
 
 def _stable_facts(params: dict, ctx: CheckContext) -> tuple[float, str]:

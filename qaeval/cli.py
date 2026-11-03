@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -175,7 +176,26 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _load_dotenv(path: Path = Path(".env")) -> None:
+    """加载项目根目录的 .env，方便本地开发；不覆盖已有的环境变量。
+
+    .env 已在 .gitignore 中，key 不会进入仓库。
+    """
+    if not path.exists():
+        return
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and value and key not in os.environ:
+            os.environ[key] = value
+
+
 def main(argv: list[str] | None = None) -> int:
+    _load_dotenv()
     args = build_parser().parse_args(argv)
     return int(args.func(args))
 
