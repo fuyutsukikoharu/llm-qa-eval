@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.idea/
+.vscode/
+.DS_Store
+reports/*/results.jsonl
+
+# 个人教程，不随仓库发布
+TUTORIAL.md
+

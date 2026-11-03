@@ -1,0 +1,39 @@
+﻿# 鍔犲浐閰嶇疆锛歷2 prompt + 鍚屼箟璇嶆绱㈡墿灞?+ 杈撳叆/杈撳嚭鎶ゆ爮
+# 鐢ㄦ潵楠岃瘉銆屼慨妫€绱?+ 鍔犳姢鏍忋€嶅埌搴曟彁鍗囦簡澶氬皯锛屼互鍙婂摢浜涢棶棰樺畠淇笉浜嗭紙鏍煎紡鍖栬緭鍑猴級銆?run_name: hardened
+provider: mock
+model: mock-baseline
+base_url: ""
+api_key_env: DEEPSEEK_API_KEY
+temperature: 0.2
+max_tokens: 512
+timeout_s: 60
+retries: 2
+concurrency: 4
+
+paths:
+  cases: ../data/cases.yaml
+  kb: ../data/kb
+  system_prompt: ../prompts/system_v2.md
+  out_dir: ../reports/hardened
+
+retrieval:
+  top_k: 3
+  min_score: 3.0
+  expand_synonyms: true           # 鍙ｈ -> 鐭ヨ瘑搴撶敤璇?
+guardrails:
+  enabled: true
+  block_injection: true
+  block_pii_requests: true
+  redact_pii: true
+  require_citation: true
+  medical_escalation: true
+
+judge:
+  provider: heuristic
+  model: mock-judge
+  base_url: ""
+  api_key_env: DEEPSEEK_API_KEY
+
+report:
+  pass_threshold: 0.8
+

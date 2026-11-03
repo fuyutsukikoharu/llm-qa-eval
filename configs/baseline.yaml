@@ -1,0 +1,33 @@
+﻿# 鍩虹嚎閰嶇疆锛歮ock 妯″瀷 + 鏃犲悓涔夎瘝鎵╁睍 + 鏃犳姢鏍?# 鎹㈡垚鐪熷疄妯″瀷鏃讹紝鍙渶瑕佹敼 provider / base_url / model / api_key_env 鍥涢」銆?run_name: baseline
+provider: mock
+model: mock-baseline
+base_url: ""                     # 渚嬶細https://api.deepseek.com/v1
+api_key_env: DEEPSEEK_API_KEY
+temperature: 0.2
+max_tokens: 512
+timeout_s: 60
+retries: 2
+concurrency: 4
+
+paths:
+  cases: ../data/cases.yaml
+  kb: ../data/kb
+  system_prompt: ../prompts/system_v1.md
+  out_dir: ../reports/baseline
+
+retrieval:
+  top_k: 3
+  min_score: 3.0
+  expand_synonyms: false          # 鍩虹嚎锛氬彧鐢ㄥ師濮嬭瘝闈㈡绱?
+guardrails:
+  enabled: false                  # 鍩虹嚎锛氭病鏈夎緭鍏?杈撳嚭鎶ゆ爮
+
+judge:
+  provider: heuristic             # 绂荤嚎鍗犱綅 judge锛涚湡瀹炲疄楠屾敼鎴?openai
+  model: mock-judge
+  base_url: ""
+  api_key_env: DEEPSEEK_API_KEY
+
+report:
+  pass_threshold: 0.8
+
